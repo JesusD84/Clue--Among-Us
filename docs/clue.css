@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Carter+One&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
+
+#content {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    background-color: black;
+}
+
+/* Video */
+#content video {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Imagen */
+#content img {
+    max-width: 100%;
+    height: auto;
+}
+
+.bg {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    color: #f1f1f1;
+    padding: 20px;
+}
+
+/* Titulo */
+#title {
+    top: 3%;
+    left: 50%;
+    margin-left: -240px;
+    font-family: 'Carter One', cursive;
+    font-size: 60px;
+}
+
+/* Mensaje*/
+#mensaje {
+    top: 25%;
+    left: 29%;
+    max-width: 40%;
+    min-width: 40%;
+    display: none;
+}
+
+#mensaje div {
+    margin: 0 auto;
+    width: 80%;
+    font-size: 18px;
+    text-align: center;
+    padding: 10px;
+    border: none;
+    background: #000;
+    color: #fff;
+}
+
+#mensaje div button {
+    border: none;
+    font-size: 18px;
+    text-align: center;
+    color: #fff;
+    background: #000;
+    cursor: pointer;
+}
+
+#mensaje div button:hover {
+    background: #ddd;
+    color: black;
+}
+
+/* Boton continuar */
+#next {
+    bottom: 10%;
+    right: 10%;
+    width: 15%;
+    display: none;
+}
+
+#next button {
+    margin: 0 20px;
+    width: 80%;
+    font-weight: bold;
+    font-size: 25px;
+    padding: 10px;
+    border: none;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+  }
+
+#next button:hover {
+    background: #ddd;
+    color: black;
+}
+
+/* Botones personajes */
+.personajes {
+    position: fixed;
+    display: none;
+    background: transparent;
+    width: 445px;
+    height: 79px;
+    cursor: pointer;
+}
+
+#negro {
+    left: 193px;
+    top: 147px;
+}
+
+#morado {
+    left: 193px;
+    top: 245px;
+}
+
+#rojo {
+    left: 193px;
+    top: 342px;
+}
+
+#amarillo {
+    left: 659px;
+    top: 147px;
+}
+
+#azul {
+    left: 659px;
+    top: 245px;
+}
+
+/* Botones habitaciones */
+.habitaciones {
+    position: fixed;
+    display: none;
+    background: rgba(200, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+#hospital {
+    left: 417px;
+    top: 227px;
+    width: 130px;
+    height: 168px;
+}
+
+#armeria {
+    left: 950px;
+    top: 91px;
+    width: 141px;
+    height: 159px;
+}
+
+#navegacion {
+    left: 1200px;
+    top: 278px;
+    width: 109px;
+    height: 142px;
+}
+
+#escudos {
+    left: 953px;
+    top: 502px;
+    width: 138px;
+    height: 160px;
+}
+
+#electricidad {
+    left: 442px;
+    top: 421px;
+    width: 156px;
+    height: 166px;
+}
