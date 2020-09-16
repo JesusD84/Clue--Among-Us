@@ -34,28 +34,12 @@ let arregloPersonajes = ['rojo','azul','negro','amarillo','morado'];
 let arregloHabitaciones = ['hospital','armeria','navegacion','escudos','electricidad'];
 let arregloArmas = ['pistola','llave inglesa','cuchillo','tuberia','candelabro'];
 
-let personajesDesordenados = arregloPersonajes.sort(() => Math.random() - 0.5);
-let habitacionesDesordenados = arregloHabitaciones.sort(() => Math.random() - 0.5);
-let armasDesordenados= arregloArmas.sort(() => Math.random() - 0.5);
+let personajesDesordenados;
+let habitacionesDesordenados;
+let armasDesordenados;
 
-let historiaCulpable = {
-    personaje: personajesDesordenados[Math.floor(Math.random() * 5)],
-    habitacion: habitacionesDesordenados[Math.floor(Math.random() * 5)],
-    arma: armasDesordenados[Math.floor(Math.random() * 5)],
-}
+let historiaCulpable;
 let arregloHistorias = [];
-
-for(let i = 0; i<5; i++) {
-    let historia = {
-        personaje: personajesDesordenados[i],
-        habitacion: habitacionesDesordenados[i],
-        arma: armasDesordenados[i]
-    }
-    arregloHistorias.push(historia);
-}
-
-
-console.log(arregloHistorias, historiaCulpable);
 
 let contenido = document.getElementById('content');
 let titulo = document.getElementById('title');
@@ -66,6 +50,8 @@ let nextButton = document.querySelector('#next button');
 let img = document.createElement('img');
 let personajes = document.querySelectorAll('.personajes');
 let habitaciones = document.querySelectorAll('.habitaciones');
+
+let personajeFinal, habitacionFinal, armaFinal;
 
 let oportunidades;
 
@@ -84,7 +70,27 @@ let agregarOpcion = function (mensaje) {
 }
 
 //INICIO
-let iniciarJuego = function () {  
+let iniciarJuego = function () { 
+    personajesDesordenados = arregloPersonajes.sort(() => Math.random() - 0.5);
+    habitacionesDesordenados = arregloHabitaciones.sort(() => Math.random() - 0.5);
+    armasDesordenados= arregloArmas.sort(() => Math.random() - 0.5);
+    
+    historiaCulpable = {
+        personaje: personajesDesordenados[Math.floor(Math.random() * 5)],
+        habitacion: habitacionesDesordenados[Math.floor(Math.random() * 5)],
+        arma: armasDesordenados[Math.floor(Math.random() * 5)],
+    }
+    arregloHistorias = [];
+    
+    for(let i = 0; i<5; i++) {
+        let historia = {
+            personaje: personajesDesordenados[i],
+            habitacion: habitacionesDesordenados[i],
+            arma: armasDesordenados[i]
+        }
+        arregloHistorias.push(historia);
+    }
+    
     oportunidades = 5;
     let video = document.createElement('video');
     let source = document.createElement('source');
@@ -220,10 +226,8 @@ let explicacionJuego2 = function () {
         nextButton.onclick = function() {
             mensajeElem.innerHTML = '';
             cajaMensaje.style.display = 'none';
-            let personajeElegido = elegirPersonaje();
-            let habitacionElegida = elegirHabitacion();
-            let armaElegida = elegirArma();
-            desicionFinal(personajeElegido,habitacionElegida,armaElegida);
+            next.style.display = 'none';
+            elegirPersonaje();
         }
     }
 }
@@ -240,13 +244,17 @@ let elegirPersonaje = function() {
             if(oportunidades >= 0) {
                 mostrarEvidencias(personajeElegido);
             } else {
-                return personajeElegido;
+                personajeFinal = personajeElegido;
+                elegirHabitacion();
             }
         });
     }
 }
 
 let elegirHabitacion = function() {
+    for (const personaje of personajes) {
+        personaje.style.display = 'none';
+    }
     contenido.innerHTML = '';
     img.setAttribute('src','media/mapa.png');
     contenido.append(img);
@@ -258,13 +266,21 @@ let elegirHabitacion = function() {
             if(oportunidades >= 0) {
                 mostrarEvidencias(habitacionElegida);
             }else {
-                return habitacionElegida;
+                habitacionFinal = habitacionElegida;
+                elegirArma();
             }
         });
     }
 }
 
 let elegirArma = function() {
+    for (const habitacion of habitaciones) {
+        habitacion.style.display = 'none';
+    }
+
+    mensajeElem.innerHTML = '';
+    cajaMensaje.style.display = 'block';
+
     agregarMensaje('¿Que arma quieres buscar evidencias?');  
     agregarOpcion('Pistola');
     agregarOpcion('Llave Inglesa');
@@ -282,7 +298,8 @@ let elegirArma = function() {
             if(oportunidades >= 0) {
                 mostrarEvidencias(armaElegida.toLowerCase());
             }else {
-                return armaElegida.toLowerCase();
+                armaFinal = armaElegida.toLowerCase();
+                desicionFinal(personajeFinal,habitacionFinal,armaFinal);
             }
         });
     }
@@ -393,12 +410,17 @@ let desicionFinal = function (personaje, habitacion, arma) {
                 agregarMensaje(`Felicidades!!! Has logrado dar con el impostor, habitacion y arma correctas`);
             } else {
                 agregarMensaje(`Lo siento!! Has perdido!! :(`);
+                
                 if(personaje !== historiaCulpable.personaje) {
-                    agregarMensaje(`El personaje ${personaje} era inocente, ya que las grabaciones y/o sensores si lograron detectarlo en la hora del asesinato`);
-                } else if(habitacion !== historiaCulpable.habitacion) {
-                    agregarMensaje(`La habitacion ${habitacione} es erronea, ya que las grabaciones y/o sensores si estaban activas en la hora del asesinato`);
-                } else if(arma === historiaCulpable.arma) {
-                    agregarMensaje(`El arma ${arma} es erronea, ya que las grabaciones y/o sensores si lograron encontrarlo en la hora del asesinato`);
+                    agregarMensaje(`El personaje ${capitalize(personaje)} era inocente, ya que las grabaciones y/o sensores si lograron detectarlo en la hora del asesinato`);
+                }
+                
+                if(habitacion !== historiaCulpable.habitacion) {
+                    agregarMensaje(`La habitacion ${capitalize(habitacion)} es erronea, ya que las grabaciones y/o sensores si estaban activas en la hora del asesinato`);
+                }
+                
+                if(arma !== historiaCulpable.arma) {
+                    agregarMensaje(`El arma ${capitalize(arma)} es erronea, ya que las grabaciones y/o sensores si lograron encontrarlo en la hora del asesinato`);
                 }
         }
         
@@ -408,13 +430,14 @@ let desicionFinal = function (personaje, habitacion, arma) {
             titulo.style.display = 'block';
             mensajeElem.innerHTML = '';
             next.style.display = 'none';
+            cajaMensaje.style.display = 'none';
             iniciarJuego();
         }
     }
 }
 
+window.onclick = function () { iniciarJuego(); this.onclick=null }
 
-iniciarJuego();
 
 
 
