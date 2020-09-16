@@ -34,6 +34,29 @@ let arregloPersonajes = ['rojo','azul','negro','amarillo','morado'];
 let arregloHabitaciones = ['hospital','armeria','navegacion','escudos','electricidad'];
 let arregloArmas = ['pistola','llave inglesa','cuchillo','tuberia','candelabro'];
 
+let personajesDesordenados = arregloPersonajes.sort(() => Math.random() - 0.5);
+let habitacionesDesordenados = arregloHabitaciones.sort(() => Math.random() - 0.5);
+let armasDesordenados= arregloArmas.sort(() => Math.random() - 0.5);
+
+let historiaCulpable = {
+    personaje: personajesDesordenados[Math.floor(Math.random() * 5)],
+    habitacion: habitacionesDesordenados[Math.floor(Math.random() * 5)],
+    arma: armasDesordenados[Math.floor(Math.random() * 5)],
+}
+let arregloHistorias = [];
+
+for(let i = 0; i<5; i++) {
+    let historia = {
+        personaje: personajesDesordenados[i],
+        habitacion: habitacionesDesordenados[i],
+        arma: armasDesordenados[i]
+    }
+    arregloHistorias.push(historia);
+}
+
+
+console.log(arregloHistorias, historiaCulpable);
+
 let contenido = document.getElementById('content');
 let titulo = document.getElementById('title');
 let cajaMensaje = document.getElementById('mensaje');
@@ -46,7 +69,7 @@ let img = document.createElement('img');
 let personajes = document.querySelectorAll('.personajes');
 let habitaciones = document.querySelectorAll('.habitaciones');
 
-let oportunidades = 3;
+let oportunidades = 5;
 
 let agregarMensaje = function (mensaje) { 
     let msg = document.createElement('p');
@@ -134,7 +157,7 @@ let explicacionJuego2 = function () {
  }
 
  let explicacionJuego4 = function () {
-    agregarMensaje('Podras consultar los videos de la nave 3 veces');
+    agregarMensaje('Podras consultar los videos de la nave 5 veces');
     agregarMensaje('Con la informacion dada, tendras que decidir quien es el impostor y hecharlo por la borda');
     agregarMensaje('Si logras dar con el impostor, lugar y arma usada, ganaras');
     agregarMensaje('De lo contrario, perderas');
@@ -173,6 +196,8 @@ let explicacionJuego2 = function () {
               }
             });
         }      
+    } else {
+        
     }
 }
 
@@ -185,7 +210,7 @@ let elegirPersonaje = function() {
         personaje.style.display = 'block';
         personaje.addEventListener('click', function (event) { 
             let personajeElegido = personaje.getAttribute('id');
-            
+            mostrarEvidencias(personajeElegido);
         });
     }
 }
@@ -199,7 +224,7 @@ let elegirHabitacion = function() {
         habitacion.style.display = 'block';
         habitacion.addEventListener('click', function (event) { 
             let habitacionElegida = habitacion.getAttribute('id');
-            
+            mostrarEvidencias(habitacionElegida);
         });
     }
 }
@@ -217,10 +242,86 @@ let elegirArma = function() {
     for (const arma of armas) {
         arma.addEventListener('click', function(event) {
             let armaElegida = arma.innerHTML;
-            alert(armaElegida);
-            
+            mensajeElem.innerHTML = '';
+            cajaMensaje.style.display = 'none';
+
+            mostrarEvidencias(armaElegida.toLowerCase());
         });
     }
+}
+
+const capitalize = (s) => {
+    if (typeof s !== 'string') return ''
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
+
+let mostrarEvidencias = function (opcionElegida) {  
+    for (const personaje of personajes) {
+        personaje.style.display = 'none';
+    }
+    for (const habitacion of habitaciones) {
+        habitacion.style.display = 'none';
+    }
+    contenido.innerHTML = '';
+    let video = document.createElement('video');
+    let source = document.createElement('source');
+    let historiaElegida;
+
+    for(historia of arregloHistorias) {
+        for(i in historia) {
+            if(opcionElegida === historia[i]) {
+                historiaElegida = historia;
+                if(historia.personaje === historiaCulpable.personaje || 
+                   historia.habitacion === historiaCulpable.habitacion) {
+                   source.setAttribute('src',`media/camaras.mp4`);
+                }else {
+                    source.setAttribute('src',`media/${historia.personaje}-${historia.habitacion}.mp4`);
+                }
+                source.setAttribute('type',"video/mp4");
+
+                video.setAttribute('autoplay', "");
+                video.setAttribute('id','myVideo');
+                video.append(source);
+
+                contenido.append(video);
+                video.play();
+                
+                //Esperar que acabe video
+                video.onended = function() {
+                    mensajeElem.innerHTML = '';
+                    agregarMensaje(`${capitalize(historiaElegida.personaje)} dice que estuvo en ${capitalize(historiaElegida.habitacion)} y que vio el objeto ${capitalize(historiaElegida.arma)}`);
+                    if(historiaElegida.personaje === historiaCulpable.personaje) {
+                        agregarMensaje(`Al parecer no se encontraron grabaciones de ${capitalize(historiaElegida.personaje)}`);
+                    } else {
+                        agregarMensaje(`Las grabaciones y/o sensores registraron a ${capitalize(historiaElegida.personaje)} haciendo tareas`);
+                    }
+                    
+                    if(historiaElegida.habitacion === historiaCulpable.habitacion) {
+                        agregarMensaje(`Por desgracia, las grabaciones y/o sensores estaban deshabilitadas en ${capitalize(historiaElegida.habitacion)}`);
+                    } else {
+                        agregarMensaje(`Las grabaciones y/o sensores si estaban operando en ${capitalize(historiaElegida.habitacion)}`);
+                    }
+                    
+                    if(historiaElegida.arma === historiaCulpable.arma) {
+                        agregarMensaje(`Los sensores y/o grabaciones NO encontraron el objeto ${capitalize(historiaElegida.arma)} por ningun lado`);
+                        
+                    }else {
+                        agregarMensaje(`Los sensores y/o grabaciones han detectado el objeto ${capitalize(historiaElegida.arma)}`);
+            
+                    }
+                    cajaMensaje.style.display = 'block';
+                    next.style.display = 'block';
+                }
+            
+                nextButton.onclick = function() {
+                    mensajeElem.innerHTML = '';
+                    next.style.display = 'none';
+                    elegirPregunta();
+                }
+            }
+        }
+    }
+
 }
 
 
