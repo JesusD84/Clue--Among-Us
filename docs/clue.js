@@ -63,13 +63,11 @@ let cajaMensaje = document.getElementById('mensaje');
 let mensajeElem = document.querySelector('#mensaje div');
 let next = document.getElementById('next');
 let nextButton = document.querySelector('#next button');
-let video = document.createElement('video');
-let source = document.createElement('source');
 let img = document.createElement('img');
 let personajes = document.querySelectorAll('.personajes');
 let habitaciones = document.querySelectorAll('.habitaciones');
 
-let oportunidades = 5;
+let oportunidades;
 
 let agregarMensaje = function (mensaje) { 
     let msg = document.createElement('p');
@@ -87,6 +85,10 @@ let agregarOpcion = function (mensaje) {
 
 //INICIO
 let iniciarJuego = function () {  
+    oportunidades = 5;
+    let video = document.createElement('video');
+    let source = document.createElement('source');
+
     source.setAttribute('src','media/muerte.mp4');
     source.setAttribute('type',"video/mp4");
 
@@ -95,6 +97,7 @@ let iniciarJuego = function () {
     video.append(source);
 
     contenido.append(video);
+    video.play();
 
     //Esperar que acabe video
     video.onended = function() {
@@ -108,6 +111,19 @@ let iniciarJuego = function () {
     }
 
     nextButton.onclick = function() {
+        var elem = document.documentElement;
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen();
+            }
+        }
+        openFullscreen();
         titulo.style.display = 'none';
         mensajeElem.innerHTML = '';
         explicacionJuego();
@@ -197,7 +213,18 @@ let explicacionJuego2 = function () {
             });
         }      
     } else {
-        
+        agregarMensaje('Se te acabaron las oportunidades para consultar en las grabaciones');
+        agregarMensaje('Tendras que decidir como fue el asesinato');
+        next.style.display = 'block';
+
+        nextButton.onclick = function() {
+            mensajeElem.innerHTML = '';
+            cajaMensaje.style.display = 'none';
+            let personajeElegido = elegirPersonaje();
+            let habitacionElegida = elegirHabitacion();
+            let armaElegida = elegirArma();
+            desicionFinal(personajeElegido,habitacionElegida,armaElegida);
+        }
     }
 }
 
@@ -210,7 +237,11 @@ let elegirPersonaje = function() {
         personaje.style.display = 'block';
         personaje.addEventListener('click', function (event) { 
             let personajeElegido = personaje.getAttribute('id');
-            mostrarEvidencias(personajeElegido);
+            if(oportunidades >= 0) {
+                mostrarEvidencias(personajeElegido);
+            } else {
+                return personajeElegido;
+            }
         });
     }
 }
@@ -224,7 +255,11 @@ let elegirHabitacion = function() {
         habitacion.style.display = 'block';
         habitacion.addEventListener('click', function (event) { 
             let habitacionElegida = habitacion.getAttribute('id');
-            mostrarEvidencias(habitacionElegida);
+            if(oportunidades >= 0) {
+                mostrarEvidencias(habitacionElegida);
+            }else {
+                return habitacionElegida;
+            }
         });
     }
 }
@@ -244,8 +279,11 @@ let elegirArma = function() {
             let armaElegida = arma.innerHTML;
             mensajeElem.innerHTML = '';
             cajaMensaje.style.display = 'none';
-
-            mostrarEvidencias(armaElegida.toLowerCase());
+            if(oportunidades >= 0) {
+                mostrarEvidencias(armaElegida.toLowerCase());
+            }else {
+                return armaElegida.toLowerCase();
+            }
         });
     }
 }
@@ -322,6 +360,57 @@ let mostrarEvidencias = function (opcionElegida) {
         }
     }
 
+}
+
+let desicionFinal = function (personaje, habitacion, arma) {  
+    contenido.innerHTML = '';
+    let video = document.createElement('video');
+    let source = document.createElement('source');
+
+    if(personaje === historiaCulpable.personaje &&
+       habitacion === historiaCulpable.habitacion &&
+       arma === historiaCulpable.arma) {
+            source.setAttribute('src',`media/${personaje}-ganar.mp4`);
+       } else {
+            source.setAttribute('src',`media/${personaje}-perder.mp4`);
+       }
+    source.setAttribute('type',"video/mp4");
+
+    video.setAttribute('autoplay', "");
+    video.setAttribute('id','myVideo');
+    video.append(source);
+
+    contenido.append(video);
+    video.play();
+
+    //Esperar que acabe video
+    video.onended = function() {
+        cajaMensaje.style.display = 'block';
+        
+        if(personaje === historiaCulpable.personaje &&
+            habitacion === historiaCulpable.habitacion &&
+            arma === historiaCulpable.arma) {
+                agregarMensaje(`Felicidades!!! Has logrado dar con el impostor, habitacion y arma correctas`);
+            } else {
+                agregarMensaje(`Lo siento!! Has perdido!! :(`);
+                if(personaje !== historiaCulpable.personaje) {
+                    agregarMensaje(`El personaje ${personaje} era inocente, ya que las grabaciones y/o sensores si lograron detectarlo en la hora del asesinato`);
+                } else if(habitacion !== historiaCulpable.habitacion) {
+                    agregarMensaje(`La habitacion ${habitacione} es erronea, ya que las grabaciones y/o sensores si estaban activas en la hora del asesinato`);
+                } else if(arma === historiaCulpable.arma) {
+                    agregarMensaje(`El arma ${arma} es erronea, ya que las grabaciones y/o sensores si lograron encontrarlo en la hora del asesinato`);
+                }
+        }
+        
+        agregarMensaje('Para volver a jugar, has clic en Continuar');
+        next.style.display = 'block';
+        nextButton.onclick = function() {
+            titulo.style.display = 'block';
+            mensajeElem.innerHTML = '';
+            next.style.display = 'none';
+            iniciarJuego();
+        }
+    }
 }
 
 
