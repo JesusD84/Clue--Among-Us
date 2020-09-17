@@ -1,4 +1,4 @@
-# Clue--Among-Us
+# Clue: Among Us
 
 Este es un proyecto escolar.
 Es una simulacion del juego de mesa Clue, el cual esta ambientado en el videojuego Among Us.
